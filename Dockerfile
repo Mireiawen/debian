@@ -10,10 +10,12 @@ RUN \
 	apt-get "install" -y \
 		"aptitude" \
 		"dnsutils" \
+		"less" \
 		"locales" \
 		"lsb-release" \
 		"jq" \
-		"vim"
+		"vim" \
+		"wget"
 
 # Enable the backports repository
 COPY "backports.sh" "/backports.sh"
