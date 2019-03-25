@@ -13,6 +13,7 @@ RUN \
 		"less" \
 		"locales" \
 		"lsb-release" \
+		"netcat" \
 		"jq" \
 		"vim" \
 		"wget"
