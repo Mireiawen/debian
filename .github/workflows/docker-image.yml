@@ -1,3 +1,6 @@
+---
+## /* vim: set tabstop=2 softtabstop=2 shiftwidth=2 expandtab smarttab autoindent: */
+
 name: "Docker Image CI"
 
 on:
@@ -6,11 +9,19 @@ on:
   pull_request:
     branches: [ "master" ]
 
+env:
+  TAG: "buster-$(date --utc '%Y.%m.%d')"
+
 jobs:
   build:
     runs-on: "ubuntu-latest"
 
     steps:
-    - uses: "actions/checkout@v2"
+    - name: "Checkout"
+      uses: "actions/checkout@v2"
     - name: "Build the Docker image"
-      run: docker build "." --tag "mireiawen/debian:buster-$(date --utc '+%Y.%m.%d')"
+      run: docker build "." --tag "${{TAG}}"
+    - name: "Log in to the registry"
+      run: docker login --username "${{secrets.DOCKERHUB_USERNAME}}" --password "${{secrets.DOCKERHUB_PASSWORD}}"
+    - name: "Push the Docker image"
+      run: docker push --tag "${{TAG}}"
