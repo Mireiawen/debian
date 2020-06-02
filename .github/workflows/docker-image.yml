@@ -27,4 +27,4 @@ jobs:
     - name: "Log in to the registry"
       run: docker login --username "${{secrets.DOCKERHUB_USERNAME}}" --password "${{secrets.DOCKERHUB_PASSWORD}}"
     - name: "Push the Docker image"
-      run: docker push --tag "mireiawen/debian:${{ env.TAG }}"
+      run: docker push "mireiawen/debian:${{ env.TAG }}"
