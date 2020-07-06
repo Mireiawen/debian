@@ -65,6 +65,15 @@ RUN install_packages \
 	"python3-pip" \
 	"python3-setuptools"
 
+# Docker in Docker
+COPY --from="docker:dind" \
+	"/usr/local/bin/docker" \
+	"/usr/local/bin/docker"
+
+COPY --from="docker:dind" \
+	"/usr/local/bin/dind" \
+	"/usr/local/bin/dind"
+
 # Install Ansible CLI
 RUN pip3 install --system \
 	"ansible" \
