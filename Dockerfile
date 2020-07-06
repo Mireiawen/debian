@@ -36,6 +36,7 @@ RUN install_packages \
 		"net-tools" \
 		"netcat" \
 		"ntp" \
+		"procps" \
 		"pwgen" \
 		"unzip" \
 		"vim" \
