@@ -38,6 +38,7 @@ RUN install_packages \
 		"ntp" \
 		"procps" \
 		"pwgen" \
+		"sudo" \
 		"unzip" \
 		"vim" \
 		"vim-addon-manager" \
@@ -60,6 +61,10 @@ RUN install_packages \
 		"flex" \
 		"libtool" \
 		"jq"
+
+# Configure sudo
+COPY "sudoers" "/etc/sudoers"
+RUN chmod "ug=r,o=" "/etc/sudoers"
 
 # Install Python3
 RUN install_packages \
