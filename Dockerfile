@@ -44,7 +44,7 @@ RUN install_packages \
 		"wget"
 
 # Make sure we generate the locales
-RUN	echo "en_US.UTF-8 UTF-8" >"/etc/locale.gen" && \
+RUN echo "en_US.UTF-8 UTF-8" >"/etc/locale.gen" && \
 	/usr/sbin/locale-gen && \
 	/usr/sbin/update-locale LANG="en_US.UTF-8"
 
