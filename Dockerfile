@@ -75,6 +75,11 @@ COPY --from="bitnami/kubectl:latest" \
 	"/opt/bitnami/kubectl/bin/kubectl" \
 	"/usr/local/bin/kubectl"
 
+# Install OpenShift Origin CLI
+COPY --from="openshift/origin-cli:latest" \
+	"/usr/bin/oc" \
+	"/usr/local/bin/oc"
+
 # Install Vault CLI
 COPY --from="vault:latest" \
 	"/bin/vault" \
