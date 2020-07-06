@@ -80,6 +80,10 @@ COPY --from="docker:dind" \
 	"/usr/local/bin/dind" \
 	"/usr/local/bin/dind"
 
+RUN groupadd \
+	--gid "998" \
+	"docker"
+
 # Install Ansible CLI
 RUN pip3 install --system \
 	"ansible" \
