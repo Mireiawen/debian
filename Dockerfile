@@ -37,6 +37,7 @@ RUN install_packages \
 		"netcat" \
 		"ntp" \
 		"pwgen" \
+		"unzip" \
 		"vim" \
 		"vim-addon-manager" \
 		"wget"
@@ -58,6 +59,45 @@ RUN install_packages \
 		"flex" \
 		"libtool" \
 		"jq"
+
+# Install Python3
+RUN install_packages \
+	"python3-pip" \
+	"python3-setuptools"
+
+# Install Ansible CLI
+RUN pip3 install --system \
+	"ansible" \
+	"ansible-lint"
+
+# Install KubeCtl CLI
+COPY --from="bitnami/kubectl:latest" \
+	"/opt/bitnami/kubectl/bin/kubectl" \
+	"/usr/local/bin/kubectl"
+
+# Install Vault CLI
+COPY --from="vault:latest" \
+	"/bin/vault" \
+	"/usr/local/bin/vault"
+
+# Install Molecule
+RUN pip3 install --system \
+	"molecule"
+
+# Install Trivy
+COPY --from="aquasec/trivy:latest" \
+	"/usr/local/bin/trivy" \
+	"/usr/local/bin/trivy"
+
+# Install Shellcheck
+COPY --from="koalaman/shellcheck:stable" \
+	"/bin/shellcheck" \
+	"/usr/local/bin/shellcheck"
+
+# Install YQ
+COPY --from="mikefarah/yq" \
+	"/usr/bin/yq" \
+	"/usr/local/bin/yq"
 
 # Clean up the logs
 RUN find "/var/log" -type "f" |xargs truncate -s0
