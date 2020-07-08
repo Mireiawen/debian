@@ -117,6 +117,10 @@ COPY --from="koalaman/shellcheck:stable" \
 	"/bin/shellcheck" \
 	"/usr/local/bin/shellcheck"
 
+# Install J2
+RUN pip3 install --system \
+	"j2cli"
+
 # Install YQ
 COPY --from="mikefarah/yq" \
 	"/usr/bin/yq" \
