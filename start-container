@@ -1,0 +1,49 @@
+#!/bin/bash
+set -euo pipefail
+IFS=$'\n\t'
+
+TEMP="$(getopt -n 'debian-container' -o 'mut:e:' --long 'mount-home,user-tag,tag:,env:' -- "${@}")"
+eval set -- "${TEMP}"
+
+MOUNT_HOME=''
+CONTAINER_TAG='latest'
+ENVS=()
+
+while [ ${#} -gt 0 ]
+do
+	case "${1}" in
+	'-m' | '--mount-home')
+		MOUNT_HOME="--volume \"${HOME}:/home/$(whoami)\""
+		CONTAINER_TAG="$(whoami)"
+		shift
+		;;
+	
+	'-u' | '--user-tag')
+		CONTAINER_TAG="$(whoami)"
+		shift
+		;;
+	
+	'-t' | '--tag')
+		CONTAINER_TAG="${2}"
+		shift 2
+		;;
+	
+	'-e' | '--env')
+		ENVS+=("--env" "${2}")
+		shift 2
+		;;
+	
+	'--')
+		break
+		;;
+	esac
+done
+
+docker 'run' \
+	--rm \
+	--interactive \
+	--tty \
+	${ENVS[*]} \
+	${MOUNT_HOME} \
+	--volume "/var/run/docker.sock:/var/run/docker.sock" \
+	"mireiawen/debian:${CONTAINER_TAG}"

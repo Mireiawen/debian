@@ -1,0 +1,18 @@
+FROM "mireiawen/debian"
+
+RUN echo "{{ LOCALES }}" >"/etc/locale.gen" && \
+        /usr/sbin/locale-gen
+
+RUN echo "{{ CONTAINER }}" >"/etc/system_name"
+
+RUN useradd \
+	--comment "{{ NAME }}" \
+	--home-dir "/home/{{ USER }}" \
+	--user-group \
+	--groups "sudo,docker" \
+	--create-home \
+	--uid "{{ UID }}" \
+	"{{ USER }}"
+
+USER "{{ USER }}"
+WORKDIR "/home/{{ USER }}"
