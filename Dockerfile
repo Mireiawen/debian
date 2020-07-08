@@ -9,7 +9,6 @@ LABEL maintainer="Mira 'Mireiawen' Manninen"
 COPY --from="bitnami/minideb:buster" \
 	"/usr/sbin/install_packages" \
 	"/usr/sbin/install_packages"
-RUN chmod "+x" "/usr/sbin/install_packages"
 
 # Enable the backports repository
 RUN echo "deb http://ftp.debian.org/debian buster-backports main" \
