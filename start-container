@@ -5,7 +5,7 @@ IFS=$'\n\t'
 TEMP="$(getopt -n 'debian-container' -o 'mut:e:' --long 'mount-home,user-tag,tag:,env:' -- "${@}")"
 eval set -- "${TEMP}"
 
-MOUNT_HOME=''
+MOUNT_HOME=()
 CONTAINER_TAG='latest'
 ENVS=()
 
@@ -13,7 +13,7 @@ while [ ${#} -gt 0 ]
 do
 	case "${1}" in
 	'-m' | '--mount-home')
-		MOUNT_HOME="--volume \"${HOME}:/home/$(whoami)\""
+		MOUNT_HOME=("--volume" "${HOME}:/home/$(whoami)")
 		CONTAINER_TAG="$(whoami)"
 		shift
 		;;
@@ -44,6 +44,6 @@ docker 'run' \
 	--interactive \
 	--tty \
 	${ENVS[*]} \
-	${MOUNT_HOME} \
+	${MOUNT_HOME[*]} \
 	--volume "/var/run/docker.sock:/var/run/docker.sock" \
 	"mireiawen/debian:${CONTAINER_TAG}"
