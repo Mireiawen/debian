@@ -20,7 +20,7 @@ export UID
 export CONTAINER
 
 # Build the base image
-echo docker 'build' \
+docker 'build' \
 	'.' \
 	--file 'Dockerfile' \
 	--tag 'mireiawen/debian'
