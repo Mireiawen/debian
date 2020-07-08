@@ -6,8 +6,8 @@ LABEL summary="Customized Debian Docker image"
 LABEL maintainer="Mira 'Mireiawen' Manninen"
 
 # Install the installer script
-COPY \
-	"install_packages" \
+COPY --from="bitnami/minideb:buster" \
+	"/usr/sbin/install_packages" \
 	"/usr/sbin/install_packages"
 RUN chmod "+x" "/usr/sbin/install_packages"
 
