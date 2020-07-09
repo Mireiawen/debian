@@ -24,6 +24,7 @@ Running as normal user requires that you build customized image in some way. The
 
 ## `start-container` -helper
 Runs the container in interactive mode, and removes it after use. Tries to mount the Docker socket to the container for Docker in Docker -use. 
+**Note:** GNU getopt is required to run the helper script.
 
 | Short option     | Long option         |  Description                        |
 |------------------|---------------------|-------------------------------------|
