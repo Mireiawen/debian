@@ -86,7 +86,9 @@ RUN groupadd \
 # Install Ansible CLI
 RUN pip3 install --system \
 	"ansible" \
-	"ansible-lint"
+	"ansible-lint" \
+	"hvac" \
+	"ansible-modules-hashivault"
 
 # Install KubeCtl CLI
 COPY --from="bitnami/kubectl:latest" \
