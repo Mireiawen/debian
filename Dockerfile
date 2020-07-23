@@ -90,8 +90,13 @@ RUN groupadd \
 # Install Ansible CLI
 RUN pip3 install --system \
 	"ansible" \
-	"ansible-lint" \
+	"ansible-lint"
+
+# Install Ansible modules
+RUN pip3 install --system \
 	"hvac" \
+	"kubernetes" \
+	"openshift" \
 	"ansible-modules-hashivault"
 
 # Install KubeCtl CLI
