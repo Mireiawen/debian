@@ -23,11 +23,13 @@ export CONTAINER
 docker 'build' \
 	'.' \
 	--file 'Dockerfile' \
-	--tag 'mireiawen/debian'
+	--tag 'mireiawen/debian' \
+	${@}
 
 # Build the user image
 j2 'Dockerfile.user.j2' |\
 docker 'build' \
 	'.' \
 	--tag "mireiawen/debian:${USER}" \
-	--file '-'
+	--file '-' \
+	${@}
