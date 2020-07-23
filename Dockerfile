@@ -65,6 +65,10 @@ RUN install_packages \
 COPY "sudoers" "/etc/sudoers"
 RUN chmod "ug=r,o=" "/etc/sudoers"
 
+# Install MariaDB client
+RUN install_packages \
+	"mariadb-client"
+
 # Install Python3
 RUN install_packages \
 	"python3-pip" \
