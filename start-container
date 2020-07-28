@@ -2,7 +2,7 @@
 set -euo pipefail
 IFS=$'\n\t'
 
-TEMP="$(getopt -n 'debian-container' -o 'mut:e:' --long 'mount-home,user-tag,tag:,env:' -- "${@}")"
+TEMP="$(getopt -n 'debian-container' -o 'mrut:e:' --long 'mount-home,mount-home-readonly,user-tag,tag:,env:' -- "${@}")"
 eval set -- "${TEMP}"
 
 MOUNT_HOME=()
@@ -14,6 +14,12 @@ do
 	case "${1}" in
 	'-m' | '--mount-home')
 		MOUNT_HOME=("--volume" "${HOME}:/home/$(whoami)")
+		CONTAINER_TAG="$(whoami)"
+		shift
+		;;
+	
+	'-r' | '--mount-home-readonly')
+		MOUNT_HOME=("--volume" "${HOME}:/home/$(whoami):ro")
 		CONTAINER_TAG="$(whoami)"
 		shift
 		;;
