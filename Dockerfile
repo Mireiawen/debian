@@ -96,6 +96,7 @@ RUN pip3 install --system \
 RUN pip3 install --system \
 	"hvac" \
 	"kubernetes" \
+	"kubernetes-validate" \
 	"openshift" \
 	"ansible-modules-hashivault"
 
