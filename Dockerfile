@@ -1,4 +1,16 @@
+# Source images
+FROM "aquasec/trivy:latest" as trivy
+FROM "bitnami/kubectl:latest" as kubectl
+FROM "bitnami/minideb:buster" as minideb
+FROM "docker:dind" as dind
+FROM "hadolint/hadolint:latest" as hadolint
+FROM "koalaman/shellcheck:stable" as shellcheck
+FROM "mikefarah/yq:latest" as yq
+FROM "openshift/origin-cli:latest" as origin-cli
+FROM "vault:latest" as vault
+
 FROM "debian:10"
+SHELL [ "/bin/bash", "-e", "-u", "-o", "pipefail", "-c" ]
 
 # Add the labels for the image
 LABEL name="debian"
@@ -6,7 +18,7 @@ LABEL summary="Customized Debian Docker image"
 LABEL maintainer="Mira 'Mireiawen' Manninen"
 
 # Install the installer script
-COPY --from="bitnami/minideb:buster" \
+COPY --from=minideb \
 	"/usr/sbin/install_packages" \
 	"/usr/sbin/install_packages"
 
@@ -75,11 +87,11 @@ RUN install_packages \
 	"python3-setuptools"
 
 # Docker in Docker
-COPY --from="docker:dind" \
+COPY --from=dind \
 	"/usr/local/bin/docker" \
 	"/usr/local/bin/docker"
 
-COPY --from="docker:dind" \
+COPY --from=dind \
 	"/usr/local/bin/dind" \
 	"/usr/local/bin/dind"
 
@@ -88,11 +100,13 @@ RUN groupadd \
 	"docker"
 
 # Install Ansible CLI
+# hadolint ignore=DL3013
 RUN pip3 install --system \
 	"ansible" \
 	"ansible-lint"
 
 # Install Ansible modules
+# hadolint ignore=DL3013
 RUN pip3 install --system \
 	"hvac" \
 	"kubernetes" \
@@ -101,44 +115,51 @@ RUN pip3 install --system \
 	"ansible-modules-hashivault"
 
 # Install KubeCtl CLI
-COPY --from="bitnami/kubectl:latest" \
+COPY --from=kubectl \
 	"/opt/bitnami/kubectl/bin/kubectl" \
 	"/usr/local/bin/kubectl"
 
 # Install OpenShift Origin CLI
-COPY --from="openshift/origin-cli:latest" \
+COPY --from=origin-cli \
 	"/usr/bin/oc" \
 	"/usr/local/bin/oc"
 
 # Install Vault CLI
-COPY --from="vault:latest" \
+COPY --from=vault \
 	"/bin/vault" \
 	"/usr/local/bin/vault"
 
 # Install Molecule
+# hadolint ignore=DL3013
 RUN pip3 install --system \
 	"molecule"
 
 # Install Trivy
-COPY --from="aquasec/trivy:latest" \
+COPY --from=trivy \
 	"/usr/local/bin/trivy" \
 	"/usr/local/bin/trivy"
 
 # Install Shellcheck
-COPY --from="koalaman/shellcheck:stable" \
+COPY --from=shellcheck \
 	"/bin/shellcheck" \
 	"/usr/local/bin/shellcheck"
 
+# Install hadolint
+COPY --from=hadolint \
+	"/bin/hadolint" \
+	"/usr/local/bin/hadolint"
+
 # Install J2
+# hadolint ignore=DL3013
 RUN pip3 install --system \
 	"j2cli"
 
 # Install YQ
-COPY --from="mikefarah/yq" \
+COPY --from=yq \
 	"/usr/bin/yq" \
 	"/usr/local/bin/yq"
 
 # Clean up the logs
 RUN find "/var/log" -type "f" |xargs truncate -s0
 
-ENTRYPOINT "/bin/bash"
+ENTRYPOINT [ "/bin/bash" ]
