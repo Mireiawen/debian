@@ -1,6 +1,6 @@
 FROM "mireiawen/debian:latest"
 
-RUN echo "{{ LOCALES }}" >"/etc/locale.gen" && \
+RUN echo -e "{{ LOCALES }}" >"/etc/locale.gen" && \
         /usr/sbin/locale-gen
 
 RUN echo "{{ CONTAINER }}" >"/etc/system_name"
