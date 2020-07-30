@@ -29,7 +29,7 @@ do
 		shift
 		;;
 	
-	'-t' | '--tag')
+	'-t' | '--tag')
 		CONTAINER_TAG="${2}"
 		shift 2
 		;;
@@ -49,7 +49,7 @@ docker 'run' \
 	--rm \
 	--interactive \
 	--tty \
-	${ENVS[*]} \
-	${MOUNT_HOME[*]} \
+	"${ENVS[@]}" \
+	"${MOUNT_HOME[@]}" \
 	--volume "/var/run/docker.sock:/var/run/docker.sock" \
 	"mireiawen/debian:${CONTAINER_TAG}"
