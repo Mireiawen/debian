@@ -1,4 +1,4 @@
-FROM "mireiawen/debian"
+FROM "mireiawen/debian:latest"
 
 RUN echo "{{ LOCALES }}" >"/etc/locale.gen" && \
         /usr/sbin/locale-gen
@@ -15,4 +15,5 @@ RUN useradd \
 	"{{ USER }}"
 
 USER "{{ USER }}"
+# hadolint ignore=DL3000
 WORKDIR "/home/{{ USER }}"
