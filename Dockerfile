@@ -10,6 +10,7 @@ FROM "openshift/origin-cli:latest" as origin-cli
 FROM "vault:latest" as vault
 
 FROM "debian:10"
+ARG GOSU_VERSION="1.12"
 SHELL [ "/bin/bash", "-e", "-u", "-o", "pipefail", "-c" ]
 
 # Add the labels for the image
@@ -59,6 +60,15 @@ RUN install_packages \
 RUN echo "en_US.UTF-8 UTF-8" >"/etc/locale.gen" && \
 	/usr/sbin/locale-gen && \
 	/usr/sbin/update-locale LANG="en_US.UTF-8"
+
+# Install gosu for a better su+exec command
+RUN curl --silent --show-error \
+	--location \
+	--output "/usr/local/bin/gosu" \
+	"https://github.com/tianon/gosu/releases/download/${GOSU_VERSION}/gosu-amd64"
+
+RUN chmod "a+x" \
+	"/usr/local/bin/gosu"
 
 # Install some build toolchains
 RUN install_packages \
@@ -158,6 +168,11 @@ RUN pip3 install --system \
 COPY --from=yq \
 	"/usr/bin/yq" \
 	"/usr/local/bin/yq"
+
+# Install gosu entrypoint
+COPY \
+	"entrypoint.sh" \
+	"/docker-entrypoint.sh"
 
 # Clean up the logs
 RUN find "/var/log" -type "f" |xargs truncate -s0

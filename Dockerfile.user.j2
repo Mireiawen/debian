@@ -1,5 +1,6 @@
 FROM "mireiawen/debian:latest"
 
+SHELL [ "/bin/bash", "-e", "-u", "-o", "pipefail", "-c" ]
 RUN echo -e "{{ LOCALES }}" >"/etc/locale.gen" && \
         /usr/sbin/locale-gen
 
@@ -14,6 +15,8 @@ RUN useradd \
 	--uid "{{ UID }}" \
 	"{{ USER }}"
 
-USER "{{ USER }}"
 # hadolint ignore=DL3000
 WORKDIR "/home/{{ USER }}"
+
+ENV USERNAME="{{ USER }}"
+ENTRYPOINT ["/docker-entrypoint.sh"]

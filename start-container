@@ -2,25 +2,48 @@
 set -euo pipefail
 IFS=$'\n\t'
 
-TEMP="$(getopt -n 'debian-container' -o 'mrut:e:' --long 'mount-home,mount-home-readonly,user-tag,tag:,env:' -- "${@}")"
+TEMP="$(getopt -n 'debian-container' -o 'mrut:e:v:' --long 'mount-home,mount-home-readonly,user-tag,tag:,env:,volume:' -- "${@}")"
 eval set -- "${TEMP}"
 
+RW_MOUNTS=("${HOME}/.ansible/tmp" "${HOME}/.keychain")
+RO_MOUNTS=("${RW_MOUNTS[@]}")
+
 MOUNT_HOME=()
+VOLUMES=()
+MOUNTS=()
 CONTAINER_TAG='latest'
 ENVS=()
+
+function add_mounts
+{
+	if [ "${1:-"rw"}" == 'rw' ]
+	then
+		MOUNT_HOME=("--mount" "type=bind,source=${HOME},target=${HOME}")
+		local mountarr=( "${RW_MOUNTS[@]}" )
+	else
+		MOUNT_HOME=("--mount" "type=bind,source=${HOME},target=${HOME},readonly")
+		local mountarr=( "${RO_MOUNTS[@]}" )
+	fi
+
+	for mountpoint in "${mountarr[@]}"
+	do
+		VOLUMES+=("--mount" "type=tmpfs,destination=${mountpoint}")
+		MOUNTS+=("${mountpoint}")
+	done
+}
 
 while [ ${#} -gt 0 ]
 do
 	case "${1}" in
 	'-m' | '--mount-home')
-		MOUNT_HOME=("--volume" "${HOME}:/home/$(whoami)")
 		CONTAINER_TAG="$(whoami)"
+		add_mounts 'rw'
 		shift
 		;;
 	
 	'-r' | '--mount-home-readonly')
-		MOUNT_HOME=("--volume" "${HOME}:/home/$(whoami):ro")
 		CONTAINER_TAG="$(whoami)"
+		add_mounts 'ro'
 		shift
 		;;
 	
@@ -39,17 +62,37 @@ do
 		shift 2
 		;;
 	
+	'-v' | '--volume')
+		VOLUMES+=("--volume" "${2}")
+		if [ -n "${2#*:*}" ]
+		then
+			volname="${2#*:}"
+			if [ -n "${volname%%:*}" ]
+			then
+				volname="${volname%%:*}"
+			fi
+		else
+			volname="${2}"
+		fi
+		MOUNTS+=("${2}")
+		shift 2
+		;;
+
 	'--')
 		break
 		;;
 	esac
 done
 
+function implode { local IFS="$1"; shift; echo "$*"; }
+
 docker 'run' \
 	--rm \
 	--interactive \
 	--tty \
 	"${ENVS[@]}" \
+	--env VOLUMES="$(implode ';' "${MOUNTS[@]}")" \
 	"${MOUNT_HOME[@]}" \
+	"${VOLUMES[@]}" \
 	--volume "/var/run/docker.sock:/var/run/docker.sock" \
 	"mireiawen/debian:${CONTAINER_TAG}"
