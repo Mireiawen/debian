@@ -11,7 +11,7 @@ then
 		IFS=';' read -r -a 'VOLUMES' <<< "${VOLUMES}"
 		for volume in "${VOLUMES[@]}"
 		do
-			chown "${USERNAME}:${GROUP}" "${volume}"
+			chown --recursive "${USERNAME}:${GROUP}" "${volume}"
 		done
 	fi
 	
