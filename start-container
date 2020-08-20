@@ -64,7 +64,7 @@ do
 	
 	'-v' | '--volume')
 		VOLUMES+=("--volume" "${2}")
-		if [ -n "${2#*:*}" ]
+		if [ -n "${2#*:}" ]
 		then
 			volname="${2#*:}"
 			if [ -n "${volname%%:*}" ]
@@ -74,7 +74,7 @@ do
 		else
 			volname="${2}"
 		fi
-		MOUNTS+=("${2}")
+		MOUNTS+=("${volname}")
 		shift 2
 		;;
 
