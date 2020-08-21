@@ -54,7 +54,8 @@ RUN install_packages \
 		"unzip" \
 		"vim" \
 		"vim-addon-manager" \
-		"wget"
+		"wget" \
+		"whois"
 
 # Make sure we generate the locales
 RUN echo "en_US.UTF-8 UTF-8" >"/etc/locale.gen" && \
