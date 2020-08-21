@@ -16,7 +16,17 @@ then
 	fi
 	
 	# Set the command
-	set -- gosu "${USERNAME}" 'bash' "${@}"
+	set -- gosu "${USERNAME}" 'bash' '--login' "${@}"
+fi
+
+unset 'USERNAME'
+unset 'GROUP'
+unset 'VOLUMES'
+
+if [ -n "${WORKDIR:-""}" ]
+then
+	cd "${WORKDIR}"
+	unset 'WORKDIR'
 fi
 
 exec "${@}"

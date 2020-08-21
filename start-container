@@ -30,6 +30,8 @@ function add_mounts
 		VOLUMES+=("--mount" "type=tmpfs,destination=${mountpoint}")
 		MOUNTS+=("${mountpoint}")
 	done
+	
+	ENVS+=("--env" "WORKDIR=${PWD}")
 }
 
 while [ ${#} -gt 0 ]
