@@ -189,6 +189,7 @@ RUN ln --symbolic --force \
 	"/usr/local/bin/borgfs"
 
 # Install Borgmatic backup utility
+# hadolint ignore=DL3013
 RUN pip3 "install" --upgrade \
 	"borgmatic"
 
