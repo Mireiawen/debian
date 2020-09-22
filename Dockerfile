@@ -11,6 +11,7 @@ FROM "vault:latest" as vault
 
 FROM "debian:10"
 ARG GOSU_VERSION="1.12"
+ARG BORG_VERSION="1.1.13"
 SHELL [ "/bin/bash", "-e", "-u", "-o", "pipefail", "-c" ]
 
 # Add the labels for the image
@@ -174,6 +175,22 @@ COPY --from=yq \
 COPY \
 	"entrypoint.sh" \
 	"/docker-entrypoint.sh"
+
+# Install Borg backup utility
+RUN curl --silent --show-error \
+	--location \
+	--output "/usr/local/bin/borg" \
+	"https://github.com/borgbackup/borg/releases/download/${BORG_VERSION}/borg-linux64"
+RUN chown "root:root" "/usr/local/bin/borg"
+RUN chmod "u=rwx,go=rx" "/usr/local/bin/borg"
+
+RUN ln --symbolic --force \
+	"/usr/local/bin/borg" \
+	"/usr/local/bin/borgfs"
+
+# Install Borgmatic backup utility
+RUN pip3 "install" --upgrade \
+	"borgmatic"
 
 # Clean up the logs
 RUN find "/var/log" -type "f" |xargs truncate -s0
