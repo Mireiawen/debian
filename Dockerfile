@@ -24,6 +24,10 @@ COPY --from=minideb \
 	"/usr/sbin/install_packages" \
 	"/usr/sbin/install_packages"
 
+COPY \
+	"install_pip" \
+	"/usr/sbin/install_pip"
+
 # Enable the backports repository
 RUN echo "deb http://ftp.debian.org/debian buster-backports main" \
 	>"/etc/apt/sources.list.d/backports.list" 
@@ -112,14 +116,12 @@ RUN groupadd \
 	"docker"
 
 # Install Ansible CLI
-# hadolint ignore=DL3013
-RUN pip3 install --system \
+RUN install_pip \
 	"ansible" \
 	"ansible-lint"
 
 # Install Ansible modules
-# hadolint ignore=DL3013
-RUN pip3 install --system \
+RUN install_pip \
 	"hvac" \
 	"kubernetes" \
 	"kubernetes-validate" \
@@ -142,8 +144,7 @@ COPY --from=vault \
 	"/usr/local/bin/vault"
 
 # Install Molecule
-# hadolint ignore=DL3013
-RUN pip3 install --system \
+RUN install_pip \
 	"molecule"
 
 # Install Trivy
@@ -162,8 +163,7 @@ COPY --from=hadolint \
 	"/usr/local/bin/hadolint"
 
 # Install J2
-# hadolint ignore=DL3013
-RUN pip3 install --system \
+RUN install_pip \
 	"j2cli"
 
 # Install YQ
@@ -190,8 +190,12 @@ RUN ln --symbolic --force \
 
 # Install Borgmatic backup utility
 # hadolint ignore=DL3013
-RUN pip3 "install" --upgrade \
+RUN install_pip \
 	"borgmatic"
+
+# Install s3cmd
+RUN install_pip \
+	"s3cmd"
 
 # Clean up the logs
 RUN find "/var/log" -type "f" |xargs truncate -s0
