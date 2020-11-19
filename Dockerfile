@@ -122,6 +122,7 @@ RUN install_pip \
 
 # Install Ansible modules
 RUN install_pip \
+	"dnspython" \
 	"hvac" \
 	"kubernetes" \
 	"kubernetes-validate" \
