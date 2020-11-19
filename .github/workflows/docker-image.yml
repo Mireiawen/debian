@@ -17,7 +17,7 @@ jobs:
     - name: "Create the tag name"
       run: |
         export TAG="buster-$(date --utc '+%Y.%m.%d')"
-        echo "::set-env name=TAG::${TAG}"
+        echo "TAG=${TAG}" >>"${GITHUB_ENV}"
     - name: "Build the Docker image"
       run: docker build "." --tag "mireiawen/debian:${{ env.TAG }}"
     - name: "Log in to the registry"
