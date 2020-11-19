@@ -6,11 +6,8 @@ name: "Docker Image CI"
 on:
   schedule:
     - cron: '15 0 * * *'
-  workflow_dispatch:
-    inputs:
-      tag:
-        description: 'The tag to build'
-        required: false
+  repository_dispatch:
+    types: "do-build"
 
 jobs:
   build:
