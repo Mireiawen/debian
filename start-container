@@ -27,8 +27,11 @@ function add_mounts
 
 	for mountpoint in "${mountarr[@]}"
 	do
-		VOLUMES+=("--mount" "type=tmpfs,destination=${mountpoint}")
-		MOUNTS+=("${mountpoint}")
+		if [ -d "${mountpoint}" ]
+		then
+			VOLUMES+=("--mount" "type=tmpfs,destination=${mountpoint}")
+			MOUNTS+=("${mountpoint}")
+		fi
 	done
 	
 	ENVS+=("--env" "WORKDIR=${PWD}")
