@@ -20,6 +20,7 @@ then
 	then
 		set -- gosu "${USERNAME}" 'bash' '--login'
 	else
+		# shellcheck disable=SC2116
 		cmd="$(IFS=' ' echo "${@}")"
 		set -- gosu "${USERNAME}" 'bash' '--login' '-c' "${cmd}"
 	fi
