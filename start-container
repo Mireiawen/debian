@@ -5,7 +5,7 @@ IFS=$'\n\t'
 TEMP="$(getopt -n 'debian-container' -o 'mrut:e:v:' --long 'mount-home,mount-home-readonly,user-tag,tag:,env:,volume:' -- "${@}")"
 eval set -- "${TEMP}"
 
-RW_MOUNTS=("${HOME}/.ansible/tmp" "${HOME}/.ansible/cp" "${HOME}/.keychain")
+RW_MOUNTS=( "${HOME}/.ansible/tmp" "${HOME}/.ansible/cp" "${HOME}/.keychain" )
 RO_MOUNTS=("${RW_MOUNTS[@]}")
 
 MOUNT_HOME=()
