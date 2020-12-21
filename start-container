@@ -81,6 +81,7 @@ do
 		;;
 
 	'--')
+		shift
 		break
 		;;
 	esac
@@ -97,4 +98,5 @@ docker 'run' \
 	"${MOUNT_HOME[@]}" \
 	"${VOLUMES[@]}" \
 	--volume "/var/run/docker.sock:/var/run/docker.sock" \
-	"mireiawen/debian:${CONTAINER_TAG}"
+	"mireiawen/debian:${CONTAINER_TAG}" \
+	"${@}"

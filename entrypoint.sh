@@ -16,7 +16,13 @@ then
 	fi
 	
 	# Set the command
-	set -- gosu "${USERNAME}" 'bash' '--login' "${@}"
+	if [ "${#@}" -eq 0 ]
+	then
+		set -- gosu "${USERNAME}" 'bash' '--login'
+	else
+		cmd="$(IFS=' ' echo "${@}")"
+		set -- gosu "${USERNAME}" 'bash' '--login' '-c' "${cmd}"
+	fi
 fi
 
 unset 'USERNAME'
