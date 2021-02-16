@@ -1,3 +1,7 @@
+build.sh
+lint.sh
+start-container.sh
+LICENSE
 README.md
 
 .git:
@@ -18,3 +22,5 @@ refs
 
 .github:
 workflows
+
+.gitignore
