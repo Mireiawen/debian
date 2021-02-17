@@ -24,6 +24,11 @@ do
                 shift
                 ;;
 
+        '-y' | '--lint-yaml')
+                LINT_YAML="1"
+                shift
+                ;;
+
         '-a' | '--lint-all')
                 LINT_DOCKER="1"
                 LINT_SHELL="1"
@@ -35,6 +40,9 @@ do
                 shift
                 break
                 ;;
+
+	*)
+		exit 1
         esac
 done
 
