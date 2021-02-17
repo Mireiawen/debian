@@ -5,4 +5,5 @@ IFS=$'\n\t'
 pip3 'install' \
 	--system \
 	--upgrade \
+	--prefer-binary \
 	"${@}"
