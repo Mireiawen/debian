@@ -102,6 +102,10 @@ RUN install_packages \
 	"python3-pip" \
 	"python3-setuptools"
 
+# Install wheel for Python
+RUN install_pip \
+	"wheel"
+
 # Docker in Docker
 COPY --from=dind \
 	"/usr/local/bin/docker" \
