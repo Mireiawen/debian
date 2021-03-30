@@ -2,7 +2,7 @@
 set -euo pipefail
 IFS=$'\n\t'
 
-TEMP="$(getopt -n 'debian-container' -o 'mrut:e:v:' --long 'mount-home,mount-home-readonly,user-tag,tag:,env:,volume:' -- "${@}")"
+TEMP="$(getopt -n 'debian-container' -o 'mrut:e:f:v:' --long 'mount-home,mount-home-readonly,user-tag,tag:,env:,tmpfs:,volume:' -- "${@}")"
 eval set -- "${TEMP}"
 
 RW_MOUNTS=( "${HOME}/.ansible/tmp" "${HOME}/.ansible/cp" "${HOME}/.keychain" "${HOME}/.cache" )
@@ -31,24 +31,27 @@ function add_mounts
 		then
 			VOLUMES+=("--mount" "type=tmpfs,destination=${mountpoint}")
 			MOUNTS+=("${mountpoint}")
+else
+	echo "${mountpoint} not available"
 		fi
 	done
 	
 	ENVS+=("--env" "WORKDIR=${PWD}")
 }
 
+MOUNT_TYPE='none'
 while [ ${#} -gt 0 ]
 do
 	case "${1}" in
 	'-m' | '--mount-home')
 		CONTAINER_TAG="$(whoami)"
-		add_mounts 'rw'
+		MOUNT_TYPE='rw'
 		shift
 		;;
 	
 	'-r' | '--mount-home-readonly')
 		CONTAINER_TAG="$(whoami)"
-		add_mounts 'ro'
+		MOUNT_TYPE='ro'
 		shift
 		;;
 	
@@ -67,6 +70,12 @@ do
 		shift 2
 		;;
 	
+	'-f' | '--tmpfs')
+		RO_MOUNTS+=("${2}")
+		RW_MOUNTS+=("${2}")
+		shift 2
+		;;
+
 	'-v' | '--volume')
 		VOLUMES+=("--volume" "${2}")
 		if [ -n "${2#*:}" ]
@@ -89,6 +98,11 @@ do
 		;;
 	esac
 done
+
+if [ "${MOUNT_TYPE}" != 'none' ]
+then
+	add_mounts "${MOUNT_TYPE}"
+fi
 
 function implode { local IFS="$1"; shift; echo "$*"; }
 
