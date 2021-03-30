@@ -11,7 +11,7 @@ FROM "vault:latest" as vault
 
 FROM "debian:10"
 ARG GOSU_VERSION="1.12"
-ARG BORG_VERSION="1.1.13"
+ARG BORG_VERSION="1.1.16"
 ARG GH_VERSION="1.7.0"
 SHELL [ "/bin/bash", "-e", "-u", "-o", "pipefail", "-c" ]
 
