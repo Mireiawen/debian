@@ -12,6 +12,7 @@ FROM "vault:latest" as vault
 FROM "debian:10"
 ARG GOSU_VERSION="1.12"
 ARG BORG_VERSION="1.1.13"
+ARG GH_VERSION="1.7.0"
 SHELL [ "/bin/bash", "-e", "-u", "-o", "pipefail", "-c" ]
 
 # Add the labels for the image
@@ -142,6 +143,11 @@ COPY --from=kubectl \
 COPY --from=origin-cli \
 	"/usr/bin/oc" \
 	"/usr/local/bin/oc"
+
+# Install GitHub CLI
+RUN curl --silent --show-error --location \
+	"https://github.com/cli/cli/releases/download/v${GH_VERSION}/gh_${GH_VERSION}_linux_amd64.tar.gz" \
+	| tar --gunzip --extract --strip-components=1 --directory="/usr/local"
 
 # Install Vault CLI
 COPY --from=vault \
