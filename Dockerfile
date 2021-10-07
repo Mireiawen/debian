@@ -177,6 +177,10 @@ COPY --from=hadolint \
 RUN install_pip \
 	"j2cli"
 
+# Install Certbot
+RUN install_pip \
+	"certbot"
+
 # Install YQ
 COPY --from=yq \
 	"/usr/bin/yq" \
