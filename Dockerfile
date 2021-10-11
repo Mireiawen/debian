@@ -1,7 +1,7 @@
 # Source images
 FROM "aquasec/trivy:latest" as trivy
 FROM "bitnami/kubectl:latest" as kubectl
-FROM "bitnami/minideb:buster" as minideb
+FROM "bitnami/minideb:bullseye" as minideb
 FROM "docker:dind" as dind
 FROM "hadolint/hadolint:latest" as hadolint
 FROM "koalaman/shellcheck:stable" as shellcheck
@@ -9,10 +9,15 @@ FROM "mikefarah/yq:latest" as yq
 FROM "openshift/origin-cli:latest" as origin-cli
 FROM "vault:latest" as vault
 
-FROM "debian:10"
+FROM "debian:11"
 ARG GOSU_VERSION="1.12"
 ARG BORG_VERSION="1.1.16"
 ARG GH_VERSION="1.7.0"
+ARG ANSIBLE_VERSION="4.6.0"
+ARG ANSIBLE_LINT_VERSION="5.2.0"
+ARG PYTHON_KUBERNETES_VERSION="18.20.0"
+ARG PYTHON_HVAC_VERSION="0.11.2"
+ARG PYTHON_ANSIBLE_HASHIVAULT_VERSION="4.6.4"
 SHELL [ "/bin/bash", "-e", "-u", "-o", "pipefail", "-c" ]
 
 # Add the labels for the image
@@ -122,17 +127,16 @@ RUN groupadd \
 
 # Install Ansible CLI
 RUN install_pip \
-	"ansible" \
-	"ansible-lint"
+	"ansible==${ANSIBLE_VERSION}" \
+	"ansible-lint==${ANSIBLE_LINT_VERSION}"
 
 # Install Ansible modules
 RUN install_pip \
 	"dnspython" \
-	"hvac" \
-	"kubernetes" \
+	"hvac==${PYTHON_HVAC_VERSION}" \
+	"kubernetes==${PYTHON_KUBERNETES_VERSION}" \
 	"kubernetes-validate" \
-	"openshift" \
-	"ansible-modules-hashivault"
+	"ansible-modules-hashivault==${PYTHON_ANSIBLE_HASHIVAULT_VERSION}"
 
 # Install KubeCtl CLI
 COPY --from=kubectl \
