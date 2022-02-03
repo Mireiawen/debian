@@ -1,0 +1,40 @@
+---
+## /* vim: set tabstop=2 softtabstop=2 shiftwidth=2 expandtab smarttab autoindent: */
+
+# Lint the configuration
+lint:yaml:
+  stage: 'lint'
+  needs: []
+
+  image: 'python:3.8'
+
+  before_script:
+  - 'pip3 install "yamllint"'
+
+  script:
+  - 'yamllint --version'
+  - 'yamllint ".gitlab-ci.yml" .gitlab/*.yml'
+
+lint:dockerfile:
+  stage: 'lint'
+  needs: []
+
+  image: 'hadolint/hadolint:latest-debian'
+
+  script:
+  - 'hadolint --version'
+  - 'hadolint -f "gitlab_codeclimate" "Dockerfile" "Dockerfile.user.j2" > "gl-hadolint-report.json"'
+  
+  # Store the artifacts
+  artifacts:
+    reports:
+      codequality: 'gl-hadolint-report.json'
+
+lint:shell:
+  stage: 'lint'
+  needs: []
+
+  image: 'koalaman/shellcheck-alpine:latest'
+
+  script:
+  - 'shellcheck "entrypoint.sh" "start-container" "install_pip" "build.sh"'

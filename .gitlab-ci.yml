@@ -1,0 +1,29 @@
+---
+## /* vim: set tabstop=2 softtabstop=2 shiftwidth=2 expandtab smarttab autoindent: */
+
+# Load the jobs from split files
+include:
+- local: '/.gitlab/lint.yml'
+- local: '/.gitlab/docker.yml'
+
+stages:
+- 'lint'
+- 'build'
+- 'scan'
+- 'test'
+- 'push'
+- 'deploy'
+
+variables:
+  TRIVY_TIMEOUT: '15m'
+  TRIVY_CACHE_DIR: '.trivycache/'
+  TRIVY_NO_PROGRESS: '1'
+  DEBIAN_IMAGE: '${CI_REGISTRY}/mireiawen/debian'
+  DEBIAN_BUILD_IMAGE: '${DEBIAN_IMAGE}:${CI_PIPELINE_ID}'
+  DEBIAN_TARBALL: '${DEBIAN_IMAGE}-${CI_PIPELINE_ID}'
+
+services:
+- name: 'docker:dind'
+  alias: 'docker'
+
+image: 'docker:latest'

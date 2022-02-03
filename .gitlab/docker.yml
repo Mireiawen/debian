@@ -1,0 +1,115 @@
+---
+## /* vim: set tabstop=2 softtabstop=2 shiftwidth=2 expandtab smarttab autoindent: */
+
+# Build the Docker image
+build:debian:
+  stage: 'build'
+  needs:
+  - 'lint:yaml'
+
+  script:
+  # Build the image
+  - 'docker build --no-cache --tag "${DEBIAN_BUILD_IMAGE}" "."'
+
+  # Save the image to a tarball for artifact collection
+  - 'docker save --output "${DEBIAN_TARBALL}.tar" "${DEBIAN_BUILD_IMAGE}"'
+
+  # Store the artifacts
+  artifacts:
+    paths:
+    - '${DEBIAN_TARBALL}.tar'
+    expire_in: '1 week'
+
+# Run the Trivy container scanner
+trivy:drupal:
+  stage: 'scan'
+  needs:
+  - 'build:debian'
+
+  variables:
+    TRIVY_INPUT: '${DEBIAN_TARBALL}.tar'
+
+  # Install the scanner before the script runs
+  before_script:
+  - 'apk add --no-cache "curl"'
+  - 'apk add --no-cache "rpm"'
+  - 'export VERSION="$(curl --silent "https://api.github.com/repos/aquasecurity/trivy/releases/latest" | grep ''"tag_name":'' | sed -E ''s/.*"v([^"]+)".*/\1/'')"'
+  - 'echo "${VERSION}"'
+  - 'wget "https://github.com/aquasecurity/trivy/releases/download/v${VERSION}/trivy_${VERSION}_Linux-64bit.tar.gz"'
+  - 'tar -zxf "trivy_${VERSION}_Linux-64bit.tar.gz"'
+
+  script:
+
+  # Build report
+  - './trivy image --exit-code 0 --format "template" --template "@contrib/gitlab.tpl" --output "gl-container-scanning-report.json"'
+
+  # Print report on HIGH and CRITICAL issues
+  - './trivy image --exit-code 0 --severity "HIGH,CRITICAL"'
+
+  # Fail on critical vulnerabilities
+  - './trivy image --exit-code 1 --severity "CRITICAL"'
+
+  # Fail on fixed vulnerabilities
+  - './trivy image --exit-code 1 --severity "MEDIUM,HIGH,CRITICAL" --ignore-unfixed'
+
+  # Cache the vulnerability database
+  cache:
+    paths:
+    - '.trivycache/'
+
+  # Enables https://docs.gitlab.com/ee/user/application_security/container_scanning/ (Container Scanning report is available on GitLab EE Ultimate or GitLab.com Gold)
+  artifacts:
+    reports:
+      container_scanning: 'gl-container-scanning-report.json'
+
+# Push the built image to the repository with the build tag
+push:debian:build:
+  stage: 'push'
+  needs:
+  - 'build:debian'
+  - 'trivy:debian'
+
+  variables:
+    GIT_STRATEGY: 'none'
+
+  before_script:
+  # Log in to the remote repository
+  - 'echo "${CI_REGISTRY_PASSWORD}" |docker login --username "${CI_REGISTRY_USERNAME}" "${CI_REGISTRY}" --password-stdin'
+
+  script:
+
+  # Load image from build stage
+  - 'docker load < "${DEBIAN_TARBALL}.tar"'
+
+  # Push image with build tag
+  - 'docker push "${DEBIANL_BUILD_IMAGE}"'
+
+# Push the built image with latest tag
+deploy:debian:latest:
+  stage: 'deploy'
+  needs:
+  - 'build:debian'
+  - 'push:debian:build'
+
+  rules:
+  - if: '${CI_COMMIT_BRANCH} == "main"'
+    when: 'manual'
+
+  variables:
+    GIT_STRATEGY: 'none'
+    TAG: 'latest'
+
+  before_script:
+  # Log in to the remote repository
+  - 'echo "${CI_REGISTRY_PASSWORD}" |docker login --username "${CI_REGISTRY_USERNAME}" "${CI_REGISTRY}" --password-stdin'
+
+  script:
+
+  # Load image from build stage
+  - 'docker load < "${DEBIAN_TARBALL}.tar"'
+
+  # Tag the image
+  - 'docker tag "${DEBIAN_BUILD_IMAGE}" "${DEBIAN_IMAGE}:${TAG}"'
+
+  # Push it
+  - 'docker push "${DEBIAN_IMAGE}:${TAG}"'
