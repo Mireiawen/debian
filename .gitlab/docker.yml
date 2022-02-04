@@ -21,7 +21,7 @@ build:debian:
     expire_in: '1 week'
 
 # Run the Trivy container scanner
-trivy:drupal:
+trivy:debian:
   stage: 'scan'
   needs:
   - 'build:debian'
