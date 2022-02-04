@@ -6,6 +6,8 @@ build:debian:
   stage: 'build'
   needs:
   - 'lint:yaml'
+  - 'lint:dockerfile'
+  - 'lint:shell'
 
   script:
   # Build the image
